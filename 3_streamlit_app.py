@@ -36,7 +36,7 @@ st.markdown("""
     
     /* Content nach unten schieben */
     [data-testid="stAppViewContainer"] {
-        margin-top: 100px;
+        margin-top: 140px;
     }
     
     .leaflet-control-layers { display: none !important; }
