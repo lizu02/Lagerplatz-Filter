@@ -1,5 +1,0 @@
-Notwendige Bibliotheken für den Kernel:
-- GeoPandas
-- Pandas 
-- folium
-- Matplotlib
