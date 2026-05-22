@@ -45,7 +45,7 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # ========================================================================
-# LOAD DATA
+# Daten laden
 # ========================================================================
 @st.cache_data
 def load_data():
@@ -114,10 +114,10 @@ def apply_buffer_filters(gdf, infra, dist_hydrant, dist_bauernhof, dist_oev):
         gdf_hydrant_lv95 = infra['hydranten'].to_crs("EPSG:2056")
         gdf_result_lv95 = gdf_result.to_crs("EPSG:2056")
         
-        # Erstelle Buffer um alle Hydranten
+        #Buffer um alle Hydranten erstellen
         hydrant_buffer = gdf_hydrant_lv95.geometry.buffer(dist_hydrant).unary_union
         
-        # Schneide Flächen mit Buffer
+        #Flächen mit Buffer verschneiden
         gdf_result_lv95['geometry'] = gdf_result_lv95.geometry.intersection(hydrant_buffer)
         gdf_result = gdf_result_lv95.to_crs("EPSG:4326")
         gdf_result = gdf_result[~gdf_result.geometry.is_empty]
@@ -128,11 +128,11 @@ def apply_buffer_filters(gdf, infra, dist_hydrant, dist_bauernhof, dist_oev):
         gdf_bauernhof_lv95 = infra['bauernhoefe'].to_crs("EPSG:2056")
         gdf_result_lv95 = gdf_result.to_crs("EPSG:2056")
         
-        # Erstelle Buffer um Centroide aller Bauernhöfe
+        # Buffer um Zentroide aller Bauernhöfe
         bauernhof_centroids = gdf_bauernhof_lv95.geometry.centroid
         bauernhof_buffer = bauernhof_centroids.buffer(dist_bauernhof).unary_union
         
-        # Schneide Flächen mit Buffer
+        # Flächen mit Buffer verschneiden
         gdf_result_lv95['geometry'] = gdf_result_lv95.geometry.intersection(bauernhof_buffer)
         gdf_result = gdf_result_lv95.to_crs("EPSG:4326")
         gdf_result = gdf_result[~gdf_result.geometry.is_empty]
@@ -143,10 +143,10 @@ def apply_buffer_filters(gdf, infra, dist_hydrant, dist_bauernhof, dist_oev):
         gdf_oev_lv95 = infra['oev'].to_crs("EPSG:2056")
         gdf_result_lv95 = gdf_result.to_crs("EPSG:2056")
         
-        # Erstelle Buffer um alle ÖV-Haltestellen
+        # Buffer um alle ÖV-Haltestellen erstellen
         oev_buffer = gdf_oev_lv95.geometry.buffer(dist_oev).unary_union
         
-        # Schneide Flächen mit Buffer
+        # Flächen mit Buffer verschneiden
         gdf_result_lv95['geometry'] = gdf_result_lv95.geometry.intersection(oev_buffer)
         gdf_result = gdf_result_lv95.to_crs("EPSG:4326")
         gdf_result = gdf_result[~gdf_result.geometry.is_empty]
@@ -154,7 +154,7 @@ def apply_buffer_filters(gdf, infra, dist_hydrant, dist_bauernhof, dist_oev):
     return gdf_result
 
 # ========================================================================
-# CREATE MAP
+# Karte erstellen
 # ========================================================================
 def create_map(gdf_filtered, basemap_type="Höhenlinien", 
                gdf_hydrants_all=None, gdf_bauernhof_all=None, gdf_oev_all=None,
@@ -190,14 +190,13 @@ def create_map(gdf_filtered, basemap_type="Höhenlinien",
     
     folium.GeoJson(geojson, style_function=style_func).add_to(m)
     
-    # Buffer-Kreise um die Distanzen zeichnen - UNSICHTBAR (nur für Logik)
     # Hydranten Buffer
     if gdf_hydrants_all is not None and len(gdf_hydrants_all) > 0 and dist_hydrant > 0:
         for idx, row in gdf_hydrants_all.iterrows():
             try:
                 geom = row.geometry
                 if geom.geom_type == 'Point':
-                    # Hydrant Punkt (SICHTBAR)
+                    # Hydrant Punkt zeigen
                     folium.CircleMarker(
                         location=[geom.y, geom.x],
                         radius=4,
@@ -213,7 +212,7 @@ def create_map(gdf_filtered, basemap_type="Höhenlinien",
             except:
                 continue
     
-    # Bauernhöfe Centroid (SICHTBAR)
+    # Bauernhöfe Zentroide zeigen
     if gdf_bauernhof_all is not None and len(gdf_bauernhof_all) > 0:
         gdf_bauernhof_centroid = gdf_bauernhof_all.copy()
         gdf_bauernhof_centroid['geometry'] = gdf_bauernhof_centroid.geometry.centroid
@@ -221,7 +220,7 @@ def create_map(gdf_filtered, basemap_type="Höhenlinien",
             try:
                 geom = row.geometry
                 if geom.geom_type == 'Point':
-                    # Bauernhof Punkt (SICHTBAR)
+                    # Bauernhof Punkt
                     folium.CircleMarker(
                         location=[geom.y, geom.x],
                         radius=3,
@@ -237,13 +236,13 @@ def create_map(gdf_filtered, basemap_type="Höhenlinien",
             except:
                 continue
     
-    # ÖV-HALTESTELLEN (SICHTBAR)
+    # ÖV-HALTESTELLEN zeigen
     if gdf_oev_all is not None and len(gdf_oev_all) > 0:
         for idx, row in gdf_oev_all.iterrows():
             try:
                 geom = row.geometry
                 if geom.geom_type == 'Point':
-                    # ÖV Punkt (SICHTBAR)
+                    # ÖV Punkt 
                     folium.RegularPolygonMarker(
                         location=[geom.y, geom.x],
                         fill_color='#ef4444',
@@ -262,7 +261,7 @@ def create_map(gdf_filtered, basemap_type="Höhenlinien",
     return m
 
 # ========================================================================
-# MAIN APP
+# Hauptdarstellung
 # ========================================================================
 
 # Header
@@ -273,7 +272,7 @@ st.markdown("""
     </div>
     """, unsafe_allow_html=True)
 
-# Load data
+# Daten laden
 gdf = load_data()
 if gdf is None:
     st.error("Datei nicht gefunden: output/geeignete_lagerflaechen_BL.geojson")
@@ -304,17 +303,17 @@ with st.sidebar:
         (gdf["dist_hydrant_m"] <= dist_hydrant)
     ]
     
-    # Wende Buffer-Filterung an
+    # Buffer-Filterung anwenden
     gdf_filtered = apply_buffer_filters(gdf_filtered, infra, dist_hydrant, dist_bauernhof, dist_oev)
     
-    # Stats
+    # Statistiken
     st.divider()
     col1, col2, col3 = st.columns(3)
     col1.metric("Gefiltert", len(gdf_filtered))
     col2.metric("Gesamt", len(gdf))
     col3.metric("Anteil", f"{(len(gdf_filtered) / len(gdf) * 100):.0f}%")
 
-# Main content
+# Hauptinhalt
 if len(gdf_filtered) > 0:
     m = create_map(gdf_filtered, basemap_type, 
                    infra['hydranten'], infra['bauernhoefe'], infra['oev'],
@@ -332,7 +331,7 @@ if len(gdf_filtered) > 0:
         except:
             pass
     
-    # Titel UNTER der Karte
+    # Legende
     st.subheader(f"Karte ({len(gdf_filtered)} Lagerflächen)")
     st.info("Grün = Wiese | Dunkelgrün = Wald | 🔵 = Hydranten | 🟠 = Bauernhöfe (Zentrum) | 🔺 = ÖV-Haltestellen")
 else:
