@@ -334,6 +334,6 @@ if len(gdf_filtered) > 0:
     
     # Titel UNTER der Karte
     st.subheader(f"Karte ({len(gdf_filtered)} Lagerflächen)")
-    st.info("Grün = Wiese | Dunkelgrün = Wald | 🔵 Blau = Hydranten | 🟠 = Bauernhöfe (Zentrum) | 🔺 = ÖV-Haltestellen")
+    st.info("Grün = Wiese | Dunkelgrün = Wald | 🔵 = Hydranten | 🟠 = Bauernhöfe (Zentrum) | 🔺 = ÖV-Haltestellen")
 else:
     st.error("Keine Lagerflächen mit diesen Filtern gefunden")
